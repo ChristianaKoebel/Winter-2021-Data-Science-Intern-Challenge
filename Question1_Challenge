@@ -1,0 +1,69 @@
+import pandas as pd
+from pandas import ExcelWriter
+from pandas import ExcelFile
+
+shoes = pd.read_excel('/home/crkoebel/intern_challenge/2019 Winter Data Science Intern Challenge Data Set.xlsx')
+
+# Average Order Value (AOV)
+
+average_order_value = (shoes['order_amount']).mean() # AOV calculation
+print(average_order_value)
+# >> 3145.128
+
+shoes['amt_per_item'] = shoes['order_amount']/shoes['total_items']
+# Create column: order amount per item for each order
+
+mx = max(shoes['amt_per_item'])
+mn = min(shoes['amt_per_item'])
+
+print(mx)
+# >> 25725
+print(mn)
+# >> 90
+
+print(shoes[shoes['amt_per_item'] == mx].head())
+# shop_id = 78. Outlier, data entry error, or luxury shoe model?
+# >>
+#     order_id  shop_id  user_id  order_amount  total_items payment_method              created_at  amt_per_item
+# 160       161       78      990         25725            1    credit_card 2017-03-12 05:56:56.834       25725.0
+# 490       491       78      936         51450            2          debit 2017-03-26 17:08:18.911       25725.0
+# 493       494       78      983         51450            2           cash 2017-03-16 21:39:35.400       25725.0
+# 511       512       78      967         51450            2           cash 2017-03-09 07:23:13.640       25725.0
+# 617       618       78      760         51450            2           cash 2017-03-18 11:18:41.848       25725.0
+
+print(len(shoes[shoes['amt_per_item'] == mx]))
+# >> 46
+
+# Average Order Value (AOV)
+average_order_value = (shoes['order_amount']).mean() # AOV calculation
+print(average_order_value)
+# >> 3145.128
+
+# Average Basket Value (ABV)
+average_basket_value = (shoes['total_items']).mean() # ABV calculation
+print(average_basket_value)
+# >> 8.7872
+
+# Average Shoes Value (ASV)
+average_shoes_value = average_order_value/average_basket_value
+print(average_shoes_value)
+# >> 357.92152221412965
+
+# Remove shop_id 78 from dataframe
+
+shoes2 = shoes[shoes['shop_id'] != 78]
+
+# New Average Order Value (AOV)
+average_order_value_2 = (shoes2['order_amount']).mean()
+print(average_order_value_2)
+# >> 2717.3677836092047
+
+# New Average Basket Value (ABV)
+average_basket_value_2 = (shoes2['total_items']).mean()
+print(average_basket_value_2)
+# >> 8.851029471134437
+
+# New Average Shoes Value (ASV)
+average_shoes_value_2 = average_order_value_2/average_basket_value_2
+print(average_shoes_value_2)
+# >> 307.01149425287355
