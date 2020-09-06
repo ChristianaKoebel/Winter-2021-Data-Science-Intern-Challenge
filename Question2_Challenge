@@ -1,0 +1,56 @@
+a. How many orders were shipped by Speedy Express in total?
+
+SELECT COUNT(OrderID) AS NumOrders
+FROM Orders
+LEFT JOIN Shippers ON Orders.ShipperID = Shippers.ShipperID
+GROUP BY ShipperName
+HAVING ShipperName = 'Speedy Express'
+
+>> 54
+
+b. What is the last name of the employee with the most orders?
+
+CREATE TABLE EmployeeNumOrders AS
+SELECT EmployeeID, COUNT(OrderID) AS NumOrders
+FROM Orders
+GROUP BY EmployeeID
+ORDER BY NumOrders DESC
+
+SELECT LastName
+FROM Employees
+WHERE EmployeeID = 
+(SELECT EmployeeID
+FROM EmployeeNumOrders
+WHERE NumOrders IN (
+SELECT MAX(NumOrders)
+FROM EmployeeNumOrders))
+
+>> Peacock
+
+c. What product was ordered the most by customers in Germany?
+
+CREATE TABLE GermanyOrders AS
+SELECT OrderID
+FROM Orders
+WHERE CustomerID IN
+(SELECT CustomerID
+FROM Customers
+WHERE Country = 'Germany')
+
+CREATE TABLE ProductQuantities AS
+SELECT ProductID, SUM(Quantity) AS TotalQuantity
+FROM OrderDetails
+LEFT JOIN GermanyOrders ON OrderDetails.OrderID = GermanyOrders.OrderID
+GROUP BY ProductID
+ORDER BY TotalQuantity DESC
+
+SELECT ProductName
+FROM Products
+WHERE ProductID = 
+(SELECT ProductID
+FROM ProductQuantities
+WHERE TotalQuantity IN (
+SELECT MAX(TotalQuantity)
+FROM ProductQuantities))
+
+>> Gorgonzola Telino
